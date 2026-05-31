@@ -35,4 +35,44 @@ class ListResponseTest {
         assertThat(resp.totalElements()).isZero();
         assertThat(resp.totalPages()).isZero();
     }
+
+    @Test
+    void from_nullPage_throws() {
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> ListResponse.from(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Page");
+    }
+
+    @Test
+    void fromWithMapper_nullPage_throws() {
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> ListResponse.from(null, x -> x))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Page");
+    }
+
+    @Test
+    void fromWithMapper_nullMapper_throws() {
+        Page<String> page = new PageImpl<>(List.of("a"), PageRequest.of(0, 10), 1);
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> ListResponse.from(page, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Mapper");
+    }
+
+    @Test
+    void data_immutable_evenIfMutableInputProvided() {
+        java.util.ArrayList<String> mutable = new java.util.ArrayList<>(List.of("a", "b"));
+        ListResponse<String> resp = new ListResponse<>(mutable, 2L, 1);
+        mutable.clear();
+        // Defensive copy в record-constructor
+        assertThat(resp.data()).containsExactly("a", "b");
+    }
+
+    @Test
+    void data_returnedListNotMutable() {
+        ListResponse<String> resp = new ListResponse<>(List.of("a"), 1L, 1);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> resp.data().add("b"))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
 }

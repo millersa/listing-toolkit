@@ -99,6 +99,7 @@ public class MyController {
 
     @PostMapping("/api/v1/items")
     public ListResponse<MyDto> list(@RequestBody ListRequest<MyFilter> req) {
+        // mySpec is YOUR application class — you write a Specification builder per entity.
         Specification<MyEntity> spec = mySpec.getFilter(req.filter())
                 .and(mySpec.getSort(req.sorting()));
         Pageable pageable = new SimpleOffsetSortedRequest(req.pagination());

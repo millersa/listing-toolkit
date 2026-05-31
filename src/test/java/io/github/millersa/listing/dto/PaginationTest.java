@@ -20,6 +20,13 @@ class PaginationTest {
     }
 
     @Test
+    void zeroLimit_normalizedToDefault() {
+        // Согласовано с AbstractOffsetSortedRequest: 0 трактуется как «не указано».
+        Pagination p = new Pagination(0, 0);
+        assertThat(p.limit()).isEqualTo(Pagination.DEFAULT_LIMIT);
+    }
+
+    @Test
     void negativeOffset_normalizedToZero() {
         Pagination p = new Pagination(10, -100);
         assertThat(p.offset()).isZero();

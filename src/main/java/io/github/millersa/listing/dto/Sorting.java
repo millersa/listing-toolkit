@@ -9,7 +9,9 @@ import java.util.List;
 public record Sorting(List<String> sortBy) {
 
     public Sorting {
-        if (sortBy == null) sortBy = List.of();
+        // Defensive copy: гарантирует immutability даже если caller передал mutable ArrayList
+        // (типичный случай при Jackson-десериализации) или потом мутирует исходник.
+        sortBy = sortBy == null ? List.of() : List.copyOf(sortBy);
     }
 
     public static Sorting unsorted() {

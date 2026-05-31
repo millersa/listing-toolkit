@@ -47,4 +47,14 @@ class ListRequestTest {
         assertThat(r.uniqueField()).isNull();
         assertThat(r.sorting().isEmpty()).isTrue();
     }
+
+    @Test
+    void of_withSorting() {
+        ListRequest<DummyFilter> r = ListRequest.of(
+                new DummyFilter("x"),
+                Pagination.first(10),
+                Sorting.of("desc(id)"));
+        assertThat(r.sorting().sortBy()).containsExactly("desc(id)");
+        assertThat(r.uniqueField()).isNull();
+    }
 }

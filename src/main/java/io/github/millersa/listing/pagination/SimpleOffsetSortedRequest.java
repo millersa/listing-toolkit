@@ -21,14 +21,22 @@ public class SimpleOffsetSortedRequest extends AbstractOffsetSortedRequest {
         super(limit, offset, sort);
     }
 
-    /** Удобный конструктор из {@link Pagination}-DTO. */
+    /**
+     * Удобный конструктор из {@link Pagination}-DTO.
+     * <p>Если {@code pagination == null}, используются дефолты {@link AbstractOffsetSortedRequest}
+     * (limit=20, offset=0). Это сделано умышленно для controllers, где {@code @RequestBody}
+     * может не содержать пагинацию.</p>
+     */
     public SimpleOffsetSortedRequest(Pagination pagination) {
         super(pagination == null ? null : pagination.limit(),
               pagination == null ? null : pagination.offset(),
               Sort.unsorted());
     }
 
-    /** Удобный конструктор из {@link Pagination}-DTO + явной {@link Sort}. */
+    /**
+     * Удобный конструктор из {@link Pagination}-DTO + явной {@link Sort}.
+     * Поведение {@code pagination == null} аналогично {@link #SimpleOffsetSortedRequest(Pagination)}.
+     */
     public SimpleOffsetSortedRequest(Pagination pagination, Sort sort) {
         super(pagination == null ? null : pagination.limit(),
               pagination == null ? null : pagination.offset(),

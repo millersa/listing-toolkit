@@ -13,7 +13,9 @@ public record Pagination(int limit, int offset) {
     public static final int DEFAULT_LIMIT = 20;
 
     public Pagination {
-        if (limit < 0) limit = DEFAULT_LIMIT;
+        // 0 и negative ведут к одному поведению: нормализация на DEFAULT_LIMIT.
+        // Это согласовано с AbstractOffsetSortedRequest.defaultLimitIfNull.
+        if (limit <= 0) limit = DEFAULT_LIMIT;
         if (offset < 0) offset = 0;
     }
 

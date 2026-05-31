@@ -99,6 +99,7 @@ public class MyController {
 
     @PostMapping("/api/v1/items")
     public ListResponse<MyDto> list(@RequestBody ListRequest<MyFilter> req) {
+        // mySpec — это ВАШ класс приложения, реализует сборку Specification под свою entity.
         Specification<MyEntity> spec = mySpec.getFilter(req.filter())
                 .and(mySpec.getSort(req.sorting()));
         Pageable pageable = new SimpleOffsetSortedRequest(req.pagination());

@@ -35,4 +35,9 @@ public record ListRequest<F>(
     public static <F> ListRequest<F> of(F filter, Pagination pagination) {
         return new ListRequest<>(filter, pagination, Sorting.unsorted(), null);
     }
+
+    /** Удобный конструктор с фильтром, пагинацией и сортировкой (типичный grid-кейс). */
+    public static <F> ListRequest<F> of(F filter, Pagination pagination, Sorting sorting) {
+        return new ListRequest<>(filter, pagination, sorting, null);
+    }
 }
