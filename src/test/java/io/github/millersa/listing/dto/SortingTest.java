@@ -40,4 +40,24 @@ class SortingTest {
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> s.sortBy().add("desc(name)"))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void of_nullToken_throwsWithClearMessage() {
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> Sorting.of("asc(id)", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null tokens");
+    }
+
+    @Test
+    void constructor_nullToken_throwsWithClearMessage() {
+        java.util.List<String> withNull = java.util.Arrays.asList("asc(id)", null);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> new Sorting(withNull))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null tokens");
+    }
+
+    @Test
+    void of_nullArray_returnsUnsorted() {
+        assertThat(Sorting.of((String[]) null).isEmpty()).isTrue();
+    }
 }
