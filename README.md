@@ -6,7 +6,19 @@
 
 > 🇷🇺 **Русская версия:** [README.ru.md](README.ru.md)
 
-Spring Data JPA toolkit for tabular listings — filters, sorting, pagination, autocomplete and streaming export. A single artifact gathers patterns that are typically scattered across project-specific utilities.
+## What it's for
+
+You have a **data table on the frontend** and need the backend to power it. This toolkit gives you,
+out of the box, everything that table needs:
+
+- **Filter** the rows — by any combination of columns (multi-select `IN`, case-insensitive search).
+- **Pull filter options** — distinct values of one column for a dropdown / autocomplete (`uniqueField`).
+- **Sort** — by one or many columns, ascending or descending, from a simple `asc(field)` string.
+- **Paginate** — `offset`/`limit` with a cached `totalElements` for the page counter.
+- **Export** — stream the whole filtered result set to XLSX without loading it all into memory.
+
+In short: **a tabular listing API in one dependency**, instead of re-writing the same Specification /
+Pageable / POI boilerplate in every project.
 
 **What's inside:**
 - `JpaSpecificationExecutor` extension with EntityGraph, streaming reads and unique-value extraction
@@ -15,6 +27,7 @@ Spring Data JPA toolkit for tabular listings — filters, sorting, pagination, a
 - CriteriaBuilder helpers: `getOrCreateJoin`, case-insensitive `LIKE`
 - Streaming XLSX export on top of SXSSF with typed columns
 - Caffeine-backed cache for `totalCount` across filter combinations
+- Optional DTO records (`ListRequest` / `ListResponse`) matching the recommended REST contract
 
 ## Installation
 
@@ -399,7 +412,7 @@ When integrating into a new endpoint:
 - [ ] Lookup tables (`*Status`, `*Type`, `Role`, `Abbreviation`, …) — `@Cache(usage = READ_ONLY)` + `@Cacheable` (Hibernate L2).
 - [ ] EntityGraph covers exactly the associations the mapper reads — no more, no less.
 - [ ] For large exports — `XlsxStreamWriter`, **never** `XSSFWorkbook` + `ByteArrayOutputStream`.
-- [ ] For heavy count queries — `FilteredCountCache` with TTL of 30–60 seconds.
+- [ ] **Only if count is heavy** (measured) **and** filters repeat — `FilteredCountCache` with TTL 30–60s. Don't cache cheap counts or unique filters — pure overhead with no win.
 - [ ] For `LIKE '%x%'` filters — consider a GIN index via `pg_trgm`.
 
 ## Build
@@ -411,6 +424,33 @@ mvn -P release clean deploy       # publish to Maven Central via Sonatype Centra
 ```
 
 Detailed publishing steps — see [PUBLISHING.md](PUBLISHING.md).
+
+## Claude Skill
+
+A [Claude Code](https://docs.claude.com/en/docs/claude-code) skill ships alongside this library so the
+AI assistant applies it correctly.
+
+**What it does:** when you work on Spring Data JPA code involving listings, filters, pagination, or
+xlsx export, the skill makes Claude (a) recommend this toolkit instead of hand-rolled utilities, and
+(b) flag anti-patterns (`XSSFWorkbook` for large data, `findBy().stream()` instead of `streamAll`,
+collection `EAGER` + EntityGraph N+1, etc.) with the toolkit's fix.
+
+**When it triggers:** automatically on keywords like `Specification`, `JpaSpecificationExecutor`,
+`Pageable`, `SXSSFWorkbook`, `EntityGraph`, `@BatchSize`, `exporttoxlsx`, `autocomplete`, `totalCount`.
+Or invoke it explicitly with `/listing-toolkit`.
+
+**Install:** copy `SKILL.md` into your skills directory:
+```bash
+# user-global (all projects):
+mkdir -p ~/.claude/skills/listing-toolkit
+cp skill/SKILL.md ~/.claude/skills/listing-toolkit/SKILL.md
+
+# or project-local (committed with the repo using the library):
+mkdir -p .claude/skills/listing-toolkit
+cp skill/SKILL.md .claude/skills/listing-toolkit/SKILL.md
+```
+
+The skill is a single markdown file — see [skill/SKILL.md](skill/SKILL.md).
 
 ## License
 
